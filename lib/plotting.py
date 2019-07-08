@@ -59,6 +59,42 @@ def plot_value_function(V, title="Value Function"):
     plot_surface(X, Y, Z_ace, "{} (Usable Ace)".format(title))
 
 
+def plot_blackjack_policy(P, title="Policy"):
+    """
+    Plots the policy .
+    Args:
+        P: the policy to display, map from state to action value
+    """
+    x_range = np.arange(1, 10) # dealer showing card
+    y_range = np.arange(11, 21) # planer sum
+
+
+    def plot_policy(D, title):
+        fig = plt.figure(figsize=(5, 5))
+        ax = fig.add_subplot(111)
+        y_0 = [player_sum for _, (player_sum , _, action) in enumerate(D) if action == 0]
+        x_0 = [dealer_showing for _, (_, dealer_showing, action) in enumerate(D) if action == 0]
+        y_1 = [player_sum for  _, (player_sum, _, action) in enumerate(D) if action == 1]
+        x_1 = [dealer_showing for _, (_, dealer_showing, action) in enumerate(D) if action == 1]
+        ax.scatter(x_0, y_0, c='r', marker='$H$', alpha=0.5)
+        ax.scatter(x_1, y_1, c='b', marker='$S$', alpha=0.5)
+        ax.axis([0,11,11,22])
+        ax.set_ylabel('Player Sum')
+        ax.set_xlabel('Dealer Showing')
+        ax.set_title(title)
+        ax.grid(True)
+        fig.tight_layout()
+        plt.show()
+
+    # sorted by dealer_showing
+    P_0 = sorted([(player_sum, dealer_showing, action) for (player_sum, dealer_showing, useable_ace), action in P.items() if useable_ace == True], key = lambda x:(x[1],x[2],x[0]))
+    P_1 = sorted([(player_sum, dealer_showing, action) for (player_sum, dealer_showing, useable_ace), action in P.items() if useable_ace == False], key = lambda x:(x[1],x[2],x[0]))
+    #print(f"P_0={P_0}")
+    #print(f"P_1={P_1}")
+    plot_policy(P_0, "{} (Usable Ace)".format(title))
+    plot_policy(P_1, "{} (No Usable Ace)".format(title))
+    #plot_policy(P, "{} (Usable Ace)".format(title))
+
 
 def plot_episode_stats(stats, smoothing_window=10, noshow=False):
     # Plot the episode length over time
